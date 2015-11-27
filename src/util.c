@@ -23,24 +23,24 @@
 static void
 base64_encode (const char *s, char *p)
 {
-  char base64[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  int i, length;
+    char base64[] =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    int i, length;
 
-  length = strlen (s);
-  for (i = 0; i < length; i += 3)
+    length = strlen (s);
+    for (i = 0; i < length; i += 3)
     {
-      *p++ = base64[s[0] >> 2];
-      *p++ = base64[((s[0] & 3) << 4) + (s[1] >> 4)];
-      *p++ = base64[((s[1] & 0xf) << 2) + (s[2] >> 6)];
-      *p++ = base64[s[2] & 0x3f];
-      s += 3;
+        *p++ = base64[s[0] >> 2];
+        *p++ = base64[((s[0] & 3) << 4) + (s[1] >> 4)];
+        *p++ = base64[((s[1] & 0xf) << 2) + (s[2] >> 6)];
+        *p++ = base64[s[2] & 0x3f];
+        s += 3;
     }
-  if (i == length + 1)
-    *(p - 1) = '=';
-  else if (i == length + 2)
-    *(p - 1) = *(p - 2) = '=';
-  *p = '\0';
+    if (i == length + 1)
+        *(p - 1) = '=';
+    else if (i == length + 2)
+        *(p - 1) = *(p - 2) = '=';
+    *p = '\0';
 }
 
 /*
@@ -48,25 +48,25 @@ base64_encode (const char *s, char *p)
  * Purpose  : prints arguments like printf if DEBUG is set, and
  *            adds fflush(stdout)
  * Params   : same as printf, as defined in <stdio.h>
- *        
- * Note     : this function obtained via IRC chat in 
+ *
+ * Note     : this function obtained via IRC chat in
  *            irc.openprojects.net, #c channel.
  */
 int
 debug_printf (const char *fmt, ...)
 {
-  int n;
-  va_list ap;
+    int n;
+    va_list ap;
 
-  if (DEBUG)
+    if (DEBUG)
     {
-      va_start (ap, fmt);
-      n = vprintf (fmt, ap);
-      va_end (ap);
-      fflush (stdout);
-      return n;
+        va_start (ap, fmt);
+        n = vprintf (fmt, ap);
+        va_end (ap);
+        fflush (stdout);
+        return n;
     }
-  return 0;
+    return 0;
 }
 
 /*
@@ -77,13 +77,13 @@ debug_printf (const char *fmt, ...)
 char *
 get_console_line (void)
 {
-  int count;
+    int count;
 
-  fgets (console_line, 256, stdin);
-  for (count = 0; count < strlen (console_line); count++)
-    if (console_line[count] < 32)
-      console_line[count] = 0;
-  return console_line;
+    fgets (console_line, 256, stdin);
+    for (count = 0; count < strlen (console_line); count++)
+        if (console_line[count] < 32)
+            console_line[count] = 0;
+    return console_line;
 }
 
 /*
@@ -94,11 +94,11 @@ get_console_line (void)
 void
 strtolower (char *string)
 {
-  int count;
+    int count;
 
-  for (count = 0; count < strlen (string); count++)
+    for (count = 0; count < strlen (string); count++)
     {
-      string[count] = tolower (string[count]);
+        string[count] = tolower (string[count]);
     }
 }
 
@@ -111,8 +111,8 @@ strtolower (char *string)
 void
 print_connection (int connection, char *string)
 {
-  printf (gettext ("Connection"));
-  printf (" #%d: %s", connection, string);
+    printf (gettext ("Connection"));
+    printf (" #%d: %s", connection, string);
 }
 
 /*
@@ -123,27 +123,27 @@ print_connection (int connection, char *string)
 void
 EOC (int connection)
 {
-  debug_printf (">EOC(%d)\n", connection);
-  debug_printf ("connection_status[%d]=%d\n",
-		connection, connection_status[connection]);
-  
-  client_socket_is_free[connection] = 1;
-  FD_CLR (client_socket[connection], &mask);
-  FD_CLR (client_socket[connection], &rmask);
-  close (client_socket[connection]);
+    debug_printf (">EOC(%d)\n", connection);
+    debug_printf ("connection_status[%d]=%d\n",
+                  connection, connection_status[connection]);
 
-  if (connection_status[connection] == BICONNECTED)
+    client_socket_is_free[connection] = 1;
+    FD_CLR (client_socket[connection], &mask);
+    FD_CLR (client_socket[connection], &rmask);
+    closesocket (client_socket[connection]);
+
+    if (connection_status[connection] == BICONNECTED)
     {
-      debug_printf ("connection_status[connection] == BICONNECTED\n");
-      
-      FD_CLR (proxy_socket[connection], &mask);
-      FD_CLR (proxy_socket[connection], &rmask);
-      close (proxy_socket[connection]);
-    }
-  connection_status[connection] = TO_RESET;
-  print_connection (connection, gettext ("end of connection\n"));
+        debug_printf ("connection_status[connection] == BICONNECTED\n");
 
-  debug_printf ("EOC>\n");
+        FD_CLR (proxy_socket[connection], &mask);
+        FD_CLR (proxy_socket[connection], &rmask);
+        closesocket (proxy_socket[connection]);
+    }
+    connection_status[connection] = TO_RESET;
+    print_connection (connection, gettext ("end of connection\n"));
+
+    debug_printf ("EOC>\n");
 }
 
 /*
@@ -154,12 +154,12 @@ EOC (int connection)
 void
 mark_all_client_sockets_as_free (void)
 {
-  int connection;
+    int connection;
 
-  debug_printf (">mark_all_client_sockets_as_free ()\n");
-  for (connection = 0; connection < MAX_CONNECTIONS; connection++)
-    client_socket_is_free[connection] = 1;
-  debug_printf ("mark_all_client_sockets_as_free>\n");
+    debug_printf (">mark_all_client_sockets_as_free ()\n");
+    for (connection = 0; connection < MAX_CONNECTIONS; connection++)
+        client_socket_is_free[connection] = 1;
+    debug_printf ("mark_all_client_sockets_as_free>\n");
 }
 
 /*
@@ -171,17 +171,17 @@ mark_all_client_sockets_as_free (void)
 void
 print_program_version (char *PROGRAM_NAME, char *PROGRAM_VERSION)
 {
-  int count;
+    int count;
 
-  printf ("\n-----------------------------------\n");
-  printf ("%s", PROGRAM_NAME);
-  for (count = 0; count < 25 - strlen (PROGRAM_NAME); count++)
-    printf (" ");
-  for (count = 0; count < 10 - strlen (PROGRAM_VERSION); count++)
-    printf (" ");
-  printf ("%s\n\n", PROGRAM_VERSION);
-  printf ("(C) 2003 Miguelanxo Otero Salgueiro\n");
-  printf ("-----------------------------------\n\n");
+    printf ("\n-----------------------------------\n");
+    printf ("%s", PROGRAM_NAME);
+    for (count = 0; count < 25 - strlen (PROGRAM_NAME); count++)
+        printf (" ");
+    for (count = 0; count < 10 - strlen (PROGRAM_VERSION); count++)
+        printf (" ");
+    printf ("%s\n\n", PROGRAM_VERSION);
+    printf ("(C) 2003 Miguelanxo Otero Salgueiro\n");
+    printf ("-----------------------------------\n\n");
 }
 
 /*
@@ -195,26 +195,26 @@ void
 strnsend (int fd, char *string, int len)
 {
 
-  debug_printf (">strnsend(%d,%s,%d)\n", fd, string, len);
-/*	int towrite,index=0;
+    debug_printf (">strnsend(%d,%s,%d)\n", fd, string, len);
+    /*	int towrite,index=0;
 
-	towrite=len;
-	while (towrite>BUFFSIZE) {
-		memcpy(&buffer,&string[index],BUFFSIZE);
-		write(fd,buffer,BUFFSIZE);
-		towrite=towrite-BUFFSIZE;
-		index=index+BUFFSIZE;
-	}
-	memcpy(&buffer,&string[index],towrite);
-	write(fd,buffer,towrite);
-	if (DEBUG)
-	{
-		write(1,buffer,towrite);
-		fflush(stdout);
-	}
+    towrite=len;
+    while (towrite>BUFFSIZE) {
+        memcpy(&buffer,&string[index],BUFFSIZE);
+        write(fd,buffer,BUFFSIZE);
+        towrite=towrite-BUFFSIZE;
+        index=index+BUFFSIZE;
+    }
+    memcpy(&buffer,&string[index],towrite);
+    write(fd,buffer,towrite);
+    if (DEBUG)
+    {
+        write(1,buffer,towrite);
+        fflush(stdout);
+    }
 */
-  write (fd, string, len);
-  debug_printf ("strnsend>\n");
+    send (fd, string, len, 0);
+    debug_printf ("strnsend>\n");
 }
 
 /*
@@ -226,7 +226,7 @@ strnsend (int fd, char *string, int len)
 void
 strsend (int fd, char *string)
 {
-  strnsend (fd, string, strlen (string));
+    strnsend (fd, string, strlen (string));
 }
 
 /*
@@ -238,30 +238,30 @@ strsend (int fd, char *string)
 char *
 parse_HTTP_return_code (void)
 {
-  int count;
+    int count;
 
-  debug_printf (">parse_HTTP_return_code\n");
-  /*
+    debug_printf (">parse_HTTP_return_code\n");
+    /*
    * initialize HTTP_return_code to XXX (undefined/error)
    */
-  strcpy (HTTP_return_code, "XXX");
+    strcpy (HTTP_return_code, "XXX");
 
-  if (!memcmp (buffer, "HTTP", 4))
+    if (!memcmp (buffer, "HTTP", 4))
     {
-      for (count = 0; buffer[count] != ' '; count++)
-	if (count == BUFFER_SIZE)
-	  break;
-      if (count < BUFFER_SIZE)
-	{
-	  memcpy (HTTP_return_code, &buffer[count + 1], 3);
-	  HTTP_return_code[3] = 0;
-	  debug_printf ("parse_HTTP_return_code>\n");
-	  return HTTP_return_code;
-	}
+        for (count = 0; buffer[count] != ' '; count++)
+            if (count == BUFFER_SIZE)
+                break;
+        if (count < BUFFER_SIZE)
+        {
+            memcpy (HTTP_return_code, &buffer[count + 1], 3);
+            HTTP_return_code[3] = 0;
+            debug_printf ("parse_HTTP_return_code>\n");
+            return HTTP_return_code;
+        }
     }
-  printf ("parse_HTTP_return_code:");
-  printf (gettext ("bad proxy response.\n"));
-  exit (1);
+    printf ("parse_HTTP_return_code:");
+    printf (gettext ("bad proxy response.\n"));
+    exit (1);
 }
 
 /*
@@ -274,29 +274,31 @@ parse_HTTP_return_code (void)
 int
 wait_for_crlf (int fd)
 {
-  unsigned char previous_byte = 0;
-  int count;
+    unsigned char previous_byte = 0;
+    int count;
 
-  debug_printf (">wait_for_crfl(%d)\n", fd);
-  count = 0;
-  while (1)
+    debug_printf (">wait_for_crfl(%d)\n", fd);
+    count = 0;
+    memset(buffer, 0, sizeof(buffer));
+    while (1)
     {
-      read (fd, &buffer[count], 1);
-      debug_printf ("%c", buffer[count]);
-      if ((buffer[count] == '\n') && (previous_byte == '\r'))
-	break;
-      if (count == BUFFER_SIZE)
-	{
-	  printf (" (CASCA)\n\n");
-	  printf ("wait_for_crlf: BUFFER OVERFLOW!\n");
-	  return (-1);
-	}
-      previous_byte = buffer[count];
-      count++;
+        int ret;
+        if((ret = recv (fd, &buffer[count], 1, 0)) == -1) break;
+        debug_printf ("%c", buffer[count]);
+        if ((buffer[count] == '\n') && (previous_byte == '\r'))
+            break;
+        if (count == BUFFER_SIZE)
+        {
+            printf (" (CASCA)\n\n");
+            printf ("wait_for_crlf: BUFFER OVERFLOW!\n");
+            return (-1);
+        }
+        previous_byte = buffer[count];
+        count++;
     }
-  buffer[count + 1] = 0;
-  debug_printf ("wait_for_crfl>\n");
-  return (0);
+    buffer[count + 1] = 0;
+    debug_printf ("wait_for_crfl>\n");
+    return (0);
 }
 
 /*
@@ -309,23 +311,23 @@ wait_for_crlf (int fd)
 int
 wait_for_2crlf (int fd)
 {
-  debug_printf (">wait_for_2crlf\n");
-  while (memcmp (buffer, "\r\n", 2))
+    debug_printf (">wait_for_2crlf\n");
+    while (memcmp (buffer, "\r\n", 2))
     {
-      if (wait_for_crlf (fd) < 0)
+        if (wait_for_crlf (fd) < 0)
         {
-	  return (-1);
-	}
+            return (-1);
+        }
     }
-  debug_printf ("wait_for_2crlf>\n");
-  return (0);
+    debug_printf ("wait_for_2crlf>\n");
+    return (0);
 }
 
 /*
  * Function : int connect_host_to_proxy(int connection, char *remote_host
  *          : char *remote_port)
  * Purpose  : connects to remote_host:remote_port
- *          : trough proxy_host:proxy_port 
+ *          : trough proxy_host:proxy_port
  * Params   : int connection - number of connection in use
  *          : char *remote_host - remote host (name or IP as string)
  *          : char *remote_port - remote port (number as string)
@@ -333,127 +335,127 @@ wait_for_2crlf (int fd)
 int
 connect_host_to_proxy (int connection, char *remote_host, char *remote_port)
 {
-  int count;
-  char proxy_user[256];
-  char User_Agent[256];
+    int count;
+    char proxy_user[256];
+    char User_Agent[256];
 
-  debug_printf (">connect_host_to_proxy(%d,%s,%s)\n", connection, remote_host,
-		remote_port);
-  debug_printf (">socket(AF_INET,SOCK_STREAM,0)\n");
-  if ((proxy_socket[connection] = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+    debug_printf (">connect_host_to_proxy(%d,%s,%s)\n", connection, remote_host,
+                  remote_port);
+    debug_printf (">socket(AF_INET,SOCK_STREAM,0)\n");
+    if ((proxy_socket[connection] = socket (AF_INET, SOCK_STREAM, 0)) < 0)
     {
-      perror ("socket");
-      return -1;
+        perror ("socket");
+        return -1;
     }
-  debug_printf ("socket> (%d)\n", proxy_socket[connection]);
-  if ((proxy_hostent = gethostbyname (proxy_host)) == NULL)
+    debug_printf ("socket> (%d)\n", proxy_socket[connection]);
+    if ((proxy_hostent = gethostbyname (proxy_host)) == NULL)
     {
-      switch (h_errno)
-	{
-	case TRY_AGAIN:
-	  {
-	    printf ("gethostbyname:");
-	    printf (gettext (" temporary error"));
-	    printf (gettext (" in name resolution\n"));
-	    break;
-	  }
-	case HOST_NOT_FOUND:
-	  {
-	    printf ("gethostbyname:");
-	    printf (gettext (" unknown host\n"));
-	    break;
-	  }
-	default:
-	  {
-	    printf ("gethostbyname:");
-	    printf (gettext (" non-recoverable"));
-	    printf (gettext (" name server error\n"));
-	  }
-	}
-      return -2;
+        switch (h_errno)
+        {
+        case TRY_AGAIN:
+        {
+            printf ("gethostbyname:");
+            printf (gettext (" temporary error"));
+            printf (gettext (" in name resolution\n"));
+            break;
+        }
+        case HOST_NOT_FOUND:
+        {
+            printf ("gethostbyname:");
+            printf (gettext (" unknown host\n"));
+            break;
+        }
+        default:
+        {
+            printf ("gethostbyname:");
+            printf (gettext (" non-recoverable"));
+            printf (gettext (" name server error\n"));
+        }
+        }
+        return -2;
     }
-  memset (&proxy, 0, sizeof proxy);
-  proxy.sin_family = AF_INET;
-  memcpy (&proxy.sin_addr, proxy_hostent->h_addr, proxy_hostent->h_length);
-  proxy.sin_port = htons (atoi (proxy_port));
-  debug_printf (">connect\n");
-  if (connect (proxy_socket[connection],
-	       (struct sockaddr *) &proxy, sizeof proxy) < 0)
+    memset (&proxy, 0, sizeof proxy);
+    proxy.sin_family = AF_INET;
+    memcpy (&proxy.sin_addr, proxy_hostent->h_addr, proxy_hostent->h_length);
+    proxy.sin_port = htons (atoi (proxy_port));
+    debug_printf (">connect\n");
+    if (connect (proxy_socket[connection],
+                 (struct sockaddr *) &proxy, sizeof proxy) < 0)
     {
-      perror ("connect");
-      return -3;
+        perror ("connect");
+        return -3;
     }
-  debug_printf ("connect>\n");
-  status = PROXY_OK;
-  strcpy (string, "CONNECT ");
-  strcat (string, remote_host);
-  strcat (string, ":");
-  strcat (string, remote_port);
-  strcat (string, " HTTP/1.1\r\nHost: ");
-  strcat (string, remote_host);
-  strcat (string, ":");
-  strcat (string, remote_port);
-  strcat (string, "\r\nUser-Agent: ");
-  if (getenv ("USER_AGENT") != NULL)
+    debug_printf ("connect>\n");
+    status = PROXY_OK;
+    strcpy (string, "CONNECT ");
+    strcat (string, remote_host);
+    strcat (string, ":");
+    strcat (string, remote_port);
+    strcat (string, " HTTP/1.1\r\nHost: ");
+    strcat (string, remote_host);
+    strcat (string, ":");
+    strcat (string, remote_port);
+    strcat (string, "\r\nUser-Agent: ");
+    if (getenv ("USER_AGENT") != NULL)
     {
-       strncpy (User_Agent, getenv ("USER_AGENT"), 255);
+        strncpy (User_Agent, getenv ("USER_AGENT"), 255);
     }
-  else
+    else
     {
-       strcpy (User_Agent, "Mozilla/4.0 (compatible; MSIE 5.5; Windows 98)");
+        strcpy (User_Agent, "Mozilla/4.0 (compatible; MSIE 5.5; Windows 98)");
     }
-  strcat (string, User_Agent);
-  if (getenv ("PROXY_USER") != NULL)
+    strcat (string, User_Agent);
+    if (getenv ("PROXY_USER") != NULL)
     {
-      char proxy_authorization_base64[257];
+        char proxy_authorization_base64[257];
 
-      strncpy (proxy_user, getenv ("PROXY_USER"), 255);
-      base64_encode (proxy_user, proxy_authorization_base64);
-      strcat (string, "\r\nProxy-authorization: Basic ");
-      strcat (string, proxy_authorization_base64);
-      debug_printf ("Proxy-authorization: Basic %s\n",
-		    proxy_authorization_base64);
+        strncpy (proxy_user, getenv ("PROXY_USER"), 255);
+        base64_encode (proxy_user, proxy_authorization_base64);
+        strcat (string, "\r\nProxy-authorization: Basic ");
+        strcat (string, proxy_authorization_base64);
+        debug_printf ("Proxy-authorization: Basic %s\n",
+                      proxy_authorization_base64);
     }
-  strcat (string, "\r\n\r\n");
-  strsend (proxy_socket[connection], string);
-  while (status == PROXY_OK)
+    strcat (string, "\r\n\r\n");
+    strsend (proxy_socket[connection], string);
+    while (status == PROXY_OK)
     {
-      if (wait_for_crlf (proxy_socket[connection]) < 0)
-      {
-	      EOC (connection);
-	      return -4;
-      }
-      parse_HTTP_return_code ();
-      if (!strcmp (HTTP_return_code, "200"))
-	status = BICONNECTED;
-      else
-	status = PROXY_FAULT;
+        if (wait_for_crlf (proxy_socket[connection]) < 0)
+        {
+            EOC (connection);
+            return -4;
+        }
+        parse_HTTP_return_code ();
+        if (!strcmp (HTTP_return_code, "200"))
+            status = BICONNECTED;
+        else
+            status = PROXY_FAULT;
     }
-  if (status == PROXY_FAULT)
+    if (status == PROXY_FAULT)
     {
-      /*
+        /*
        * if PROXY_FAULT then write HTTP response to stdout
        */
-      while ((count = read (proxy_socket[connection],
-			    buffer, sizeof (buffer))) != 0)
-	write (1, buffer, count);
-      return -5;
+        while ((count = read (proxy_socket[connection],
+                              buffer, sizeof (buffer))) != 0)
+            write (1, buffer, count);
+        return -5;
     }
-  /*
+    /*
    * discard the rest of HTTP header until CR LF CR LF
    * (that is, to the beginning of the real connection)
    */
-  if (wait_for_2crlf (proxy_socket[connection]) < 0)
+    if (wait_for_2crlf (proxy_socket[connection]) < 0)
     {
-      return -6;
+        return -6;
     }
-  print_connection (connection,
-		    gettext ("bidirectional connection stablished\n\n"));
-  if (proxy_socket[connection] > maxfd)
-    maxfd = proxy_socket[connection];
-  FD_SET (proxy_socket[connection], &mask);
-  debug_printf ("connect_host_to_proxy> (0)\n");
-  return 0;
+    print_connection (connection,
+                      gettext ("bidirectional connection stablished\n\n"));
+    if (proxy_socket[connection] > maxfd)
+        maxfd = proxy_socket[connection];
+    FD_SET (proxy_socket[connection], &mask);
+    debug_printf ("connect_host_to_proxy> (0)\n");
+    return 0;
 }
 
 /*
@@ -464,11 +466,11 @@ connect_host_to_proxy (int connection, char *remote_host, char *remote_port)
 void
 initialize_gettext (void)
 {
-  debug_printf (">initialize_gettext()\n");
-  setlocale (LC_ALL, "");
-  bindtextdomain ("desproxy", LOCALEDIR);
-  textdomain ("desproxy");
-  debug_printf ("initilize_gettext>\n");
+    debug_printf (">initialize_gettext()\n");
+    setlocale (LC_ALL, "");
+    bindtextdomain ("desproxy", LOCALEDIR);
+    textdomain ("desproxy");
+    debug_printf ("initilize_gettext>\n");
 }
 
 /*
@@ -479,28 +481,28 @@ initialize_gettext (void)
 int
 bind_UDP_port (unsigned int request_port)
 {
-  int UDP_socket;
+    int UDP_socket;
 
-  debug_printf ("bind_UDP_port(%d)\n", request_port);
-  if ((UDP_socket = socket (PF_INET, SOCK_DGRAM, 0)) < 0)
+    debug_printf ("bind_UDP_port(%d)\n", request_port);
+    if ((UDP_socket = socket (PF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      perror ("socket");
-      exit (1);
+        perror ("socket");
+        exit (1);
     }
-  memset (&server, 0, sizeof server);
-  server.sin_family = AF_INET;
-  server.sin_addr.s_addr = htonl (INADDR_ANY);
-  server.sin_port = htons (request_port);
-  if ((bind (UDP_socket, (struct sockaddr *) &server, sizeof server)) < 0)
+    memset (&server, 0, sizeof server);
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = htonl (INADDR_ANY);
+    server.sin_port = htons (request_port);
+    if ((bind (UDP_socket, (struct sockaddr *) &server, sizeof server)) < 0)
     {
-      perror ("bind");
-      exit (1);
+        perror ("bind");
+        exit (1);
     }
-  printf (gettext ("UDP port "));
-  printf ("%d", request_port);
-  printf (gettext (" Bound\n"));
-  debug_printf ("bind_UDP_port> (%d)\n", UDP_socket);
-  return (UDP_socket);
+    printf (gettext ("UDP port "));
+    printf ("%d", request_port);
+    printf (gettext (" Bound\n"));
+    debug_printf ("bind_UDP_port> (%d)\n", UDP_socket);
+    return (UDP_socket);
 }
 
 /*
@@ -511,33 +513,33 @@ bind_UDP_port (unsigned int request_port)
 int
 listen_in_TCP_port (unsigned int request_port)
 {
-  int request_socket;
+    int request_socket;
 
-  debug_printf ("listen_in_TCP_port(%d)\n", request_port);
-  if ((request_socket = socket (PF_INET, SOCK_STREAM, 0)) < 0)
+    debug_printf ("listen_in_TCP_port(%d)\n", request_port);
+    if ((request_socket = socket (PF_INET, SOCK_STREAM, 0)) < 0)
     {
-      perror ("socket");
-      exit (1);
+        perror ("socket");
+        exit (1);
     }
-  memset (&server, 0, sizeof server);
-  server.sin_family = AF_INET;
-  server.sin_addr.s_addr = htonl (INADDR_ANY);
-  server.sin_port = htons (request_port);
-  if ((bind (request_socket, (struct sockaddr *) &server, sizeof server)) < 0)
+    memset (&server, 0, sizeof server);
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = htonl (INADDR_ANY);
+    server.sin_port = htons (request_port);
+    if ((bind (request_socket, (struct sockaddr *) &server, sizeof server)) < 0)
     {
-      perror ("bind");
-      exit (1);
+        perror ("bind");
+        exit (1);
     }
-  if (listen (request_socket, SOMAXCONN) < 0)
+    if (listen (request_socket, SOMAXCONN) < 0)
     {
-      perror ("listen");
-      exit (1);
+        perror ("listen");
+        exit (1);
     }
-  printf (gettext ("TCP port "));
-  printf ("%d", request_port);
-  printf (gettext (" Bound & Listening\n"));
-  debug_printf ("listen_in_TCP_port> (%d)\n", request_socket);
-  return (request_socket);
+    printf (gettext ("TCP port "));
+    printf ("%d", request_port);
+    printf (gettext (" Bound & Listening\n"));
+    debug_printf ("listen_in_TCP_port> (%d)\n", request_socket);
+    return (request_socket);
 }
 
 /*
@@ -547,16 +549,17 @@ listen_in_TCP_port (unsigned int request_port)
 int
 look_for_desproxy_conf (void)
 {
-  FILE *desproxy_conf;
+    FILE *desproxy_conf;
 
-  if ((desproxy_conf = fopen ("desproxy.conf", "r")) == NULL)
+    if ((desproxy_conf = fopen ("desproxy.conf", "r")) == NULL)
     {
-      return 0;
+        return 0;
     }
-  fclose (desproxy_conf);
-  return (1);
+    fclose (desproxy_conf);
+    return (1);
 }
 
+#ifndef WIN32
 /*
  * Function : void turn_console_echo_off(void)
  * Purpose  : turns off console echo
@@ -566,14 +569,14 @@ look_for_desproxy_conf (void)
 void
 turn_console_echo_off (void)
 {
-  struct termios tty;
+    struct termios tty;
 
-  /*
+    /*
    * Save the old tty settings
    */
-  tcgetattr (0, &old_tty);
+    tcgetattr (0, &old_tty);
 
-  /*
+    /*
    * get rid of echo for the new tty settings.
    *
    * (from man tcgetattr)
@@ -583,7 +586,7 @@ turn_console_echo_off (void)
    *        REPRINT, STATUS, and WERASE, and buffers by  lines.
    *
    * ECHO   Echo input characters.
-   * 
+   *
    * ECHOE  If ICANON is also set, the ERASE  character  erases
    *        the  preceding  input  character, and WERASE erases
    *        the preceding word.
@@ -594,11 +597,11 @@ turn_console_echo_off (void)
    * ECHONL If  ICANON  is also set, echo the NL character even
    *        if ECHO is not set.
    */
-  tty = old_tty;
-  tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL);
+    tty = old_tty;
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL);
 
-  /*
-   * set new tty settings 
+    /*
+   * set new tty settings
    *
    * (from man tcsetattr)
    *
@@ -609,7 +612,7 @@ turn_console_echo_off (void)
    *  input  that  has been received but not read will be
    *  discarded before the change is made.
    */
-  tcsetattr (0, TCSAFLUSH, &tty);
+    tcsetattr (0, TCSAFLUSH, &tty);
 }
 
 /*
@@ -621,10 +624,10 @@ turn_console_echo_off (void)
 void
 turn_console_echo_on (void)
 {
-  /*
+    /*
    * Now reset the old settings
    */
-  tcsetattr (0, TCSAFLUSH, &old_tty);
+    tcsetattr (0, TCSAFLUSH, &old_tty);
 }
 
 /*
@@ -636,29 +639,30 @@ turn_console_echo_on (void)
 void
 get_username_and_password (void)
 {
-  strcpy (console_line, "");
+    strcpy (console_line, "");
 
-  while (!strcmp (console_line, ""))
+    while (!strcmp (console_line, ""))
     {
-      printf (gettext ("Username: "));
-      strcpy (username, get_console_line ());
+        printf (gettext ("Username: "));
+        strcpy (username, get_console_line ());
     }
 
-  printf (gettext ("Password: "));
+    printf (gettext ("Password: "));
 
-  /*
+    /*
    * turn out echo, so password is not displayed when typed
    */
-  turn_console_echo_off ();
-  strcpy (password, get_console_line ());
+    turn_console_echo_off ();
+    strcpy (password, get_console_line ());
 
-  /*
+    /*
    * turn on echo again
    */
-  turn_console_echo_on ();
+    turn_console_echo_on ();
 
-  /*
+    /*
    * send \n because the one in the passwd didn't echo :)
    */
-  printf ("\n");
+    printf ("\n");
 }
+#endif

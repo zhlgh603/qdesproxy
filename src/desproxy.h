@@ -11,12 +11,7 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
-#include <sys/wait.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -24,10 +19,21 @@
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
-#include <termios.h>
 #include <unistd.h>
 #include <locale.h>
 #include "util.h"
+
+#ifdef WIN32
+#include <winsock2.h>
+#include <windows.h>
+#else
+#include <sys/wait.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <termios.h>
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "../config.h"
@@ -68,7 +74,7 @@
 /*
  * Debug level, 0 = none, 1 = basic, >1 = full
  */
-#define DEBUG 0
+#define DEBUG 2
 
 int status, fd, maxfd;
 int client_socket[MAX_CONNECTIONS];
@@ -93,7 +99,9 @@ struct sockaddr_in client;
 struct sockaddr_in proxy;
 struct sockaddr_in remote;
 
+#ifndef WIN32
 struct termios old_tty;
+#endif
 
 int client_length;
 int server_length;

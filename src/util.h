@@ -158,6 +158,7 @@ void print_connection (int connection, char *string);
  */
 int look_for_desproxy_conf (void);
 
+#ifndef WIN32
 /*
  * Function : void get_username_and_password(void)
  * Purpose  : requests user to give username and password
@@ -165,3 +166,4 @@ int look_for_desproxy_conf (void);
  * Params   : none
  */
 void get_username_and_password (void);
+#endif
